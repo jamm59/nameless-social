@@ -1,0 +1,4 @@
+/node_modules
+.env
+/nameless-backend/node_modules
+/nameless-frontend/node_modules

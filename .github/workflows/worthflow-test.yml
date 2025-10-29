@@ -1,0 +1,41 @@
+name: CI Workflow
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo Setting up local database
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: testdb
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd="pg_isready -U testuser"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DATABASE_URL: postgres://testuser:testpass@localhost:5433/testdb
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Run a script
+        run: echo "Hello from Github Actions!"
+
+      - name: Running test
+        run: |
+          npm ci
+          npm run test
