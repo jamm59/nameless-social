@@ -1,254 +1,228 @@
-// app/index.tsx
-import { Stack } from 'expo-router';
-import { View, Text, Image, ScrollView, TouchableOpacity, Animated } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { User, Search, Megaphone, Users, Plus, Scroll } from 'lucide-react-native';
-// import { Ionicons } from '@expo/vector-icons';
-import Feed from '~/components/Feed';
-import Stories from '~/components/Stories';
-import ProfileHeader from '~/components/ProfileHeader';
-import { useState, useRef, useEffect } from 'react';
+import { View, Text, TextInput, FlatList, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useState } from 'react';
+import type { Restaurant, Promo } from '~/types';
+import { Ionicons } from '@expo/vector-icons';
+import BottomNavBAr from '~/components/BottomNavBar';
+
+const categories = ['Recommended', 'Pizza', 'Burger', 'Asian', 'Dessert', 'Drinks'] as const;
+
+const mockPromos: Promo[] = [
+  { id: 1, title: '20% Off First Order', image: 'https://picsum.photos/400/200?random=10' },
+  {
+    id: 2,
+    title: 'Free Delivery on Orders Over $15',
+    image: 'https://picsum.photos/400/200?random=11',
+  },
+];
+
+const mockQuickPicks: Restaurant[] = [
+  {
+    id: 'qp1',
+    name: 'Fresh Pizza Co.',
+    image: 'https://picsum.photos/160/160?random=40',
+    rating: 4.9,
+    eta: '20 min',
+    deals: 'New Arrival',
+  },
+  {
+    id: 'qp2',
+    name: 'Burger Bliss',
+    image: 'https://picsum.photos/160/160?random=41',
+    rating: 4.7,
+    eta: '15 min',
+  },
+  {
+    id: 'qp3',
+    name: 'Sushi Spot',
+    image: 'https://picsum.photos/160/160?random=42',
+    rating: 4.8,
+    eta: '25 min',
+    deals: 'Limited Time',
+  },
+];
+
+const mockNearby: Restaurant[] = [
+  {
+    id: 'n1',
+    name: 'Local Grill',
+    image: 'https://picsum.photos/300/200?random=50',
+    rating: 4.6,
+    eta: '18 min',
+    deals: '10% Off',
+  },
+  {
+    id: 'n2',
+    name: 'Veggie Delight',
+    image: 'https://picsum.photos/300/200?random=51',
+    rating: 4.5,
+    eta: '22 min',
+  },
+  {
+    id: 'n3',
+    name: 'Taco Haven',
+    image: 'https://picsum.photos/300/200?random=52',
+    rating: 4.9,
+    eta: '12 min',
+  },
+];
 
 export default function Home() {
-  const post: any[] = [
-    {
-      id: 1,
-      username: 'Annette',
-      handle: '@annette_dev',
-      text: 'Hello my friends! Testing out this new feed layout. Let’s see if everything works smoothly 😄',
-      likes: 12,
-      comments: 3,
-      reposts: 1,
-      views: '245',
-      image: null,
-      liked: false,
-    },
-    {
-      id: 2,
-      username: 'Sajon Islam',
-      handle: '@sajonislam',
-      text: 'A trip to the mountains 🌄 Nothing beats the peace and cold breeze up there!',
-      likes: 204,
-      comments: 18,
-      reposts: 5,
-      views: '3.4k',
-      image: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470',
-      liked: true,
-    },
-    {
-      id: 3,
-      username: 'Daniel Green',
-      handle: '@dan_green',
-      text: 'Just finished building my first React Native app! 🚀 Super proud of this milestone.',
-      likes: 89,
-      comments: 10,
-      reposts: 2,
-      views: '1.1k',
-      image: null,
-      liked: true,
-    },
-    {
-      id: 4,
-      username: 'Maria Lopez',
-      handle: '@maria_lopez',
-      text: 'Coffee + coding = perfect morning ☕👩‍💻',
-      likes: 56,
-      comments: 6,
-      reposts: 1,
-      views: '980',
-      image: 'https://images.unsplash.com/photo-1511920170033-f8396924c348',
-      liked: false,
-    },
-    {
-      id: 5,
-      username: 'Chris Allen',
-      handle: '@chrisallen',
-      text: 'The city lights never get old. 🌃',
-      likes: 320,
-      comments: 25,
-      reposts: 9,
-      views: '4.8k',
-      image: 'https://images.unsplash.com/photo-1508057198894-247b23fe5ade',
-      liked: true,
-    },
-    {
-      id: 6,
-      username: 'Jane Doe',
-      handle: '@jane.codes',
-      text: 'Weekend hackathon success! Built a small AI that writes poetry 🤖✍️',
-      likes: 110,
-      comments: 12,
-      reposts: 4,
-      views: '2.2k',
-      image: null,
-      liked: true,
-    },
-    {
-      id: 7,
-      username: 'Liam Turner',
-      handle: '@liamturner',
-      text: 'Nothing but blue skies today! ☀️',
-      likes: 43,
-      comments: 2,
-      reposts: 0,
-      views: '512',
-      image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
-      liked: false,
-    },
-    {
-      id: 8,
-      username: 'Sophia Kim',
-      handle: '@sophiakim',
-      text: 'Experimenting with a new camera lens 📸 Loving the results so far!',
-      likes: 92,
-      comments: 8,
-      reposts: 2,
-      views: '1.5k',
-      image: 'https://images.unsplash.com/photo-1519681393784-d120267933ba',
-      liked: true,
-    },
-    {
-      id: 9,
-      username: 'Alex Chen',
-      handle: '@alexchen',
-      text: 'If you’re learning React Native in 2025 — keep going! It’s worth it 💪🔥',
-      likes: 178,
-      comments: 22,
-      reposts: 10,
-      views: '3.9k',
-      image: null,
-      liked: true,
-    },
-    {
-      id: 10,
-      username: 'Olivia Martin',
-      handle: '@oliviam',
-      text: 'Late night debugging session… again 😅',
-      likes: 67,
-      comments: 9,
-      reposts: 3,
-      views: '1.3k',
-      image: 'https://images.unsplash.com/photo-1535223289827-42f1e9919769',
-      liked: false,
-    },
-  ];
+  const router = useRouter();
+  const { mode } = useLocalSearchParams<{ mode?: 'delivery' | 'pickup' }>();
+  const [search, setSearch] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>(categories[0]);
 
-  return (
-    <>
-      <Stack.Screen options={{ title: 'Home', headerShown: false }} />
-
-      <SafeAreaView className="flex-1 bg-black">
-        <ScrollView className="flex-1 pt-3 " showsVerticalScrollIndicator={false}>
-          <View className="h-[20rem] p-2">
-            <View className="flex-row items-center justify-between px-5 py-3">
-              <ProfileHeader />
-              <NavIcon Icon={Search} label="Search" />
-            </View>
-            <Stories />
-          </View>
-          <View className="pb-20">
-            {post.map((post) => (
-              <Feed key={post.id} {...post} />
-            ))}
-          </View>
-        </ScrollView>
-        <FloatingNavigationBar />
-      </SafeAreaView>
-    </>
-  );
-}
-
-function NavIcon({ Icon, label, active = false }: { Icon: any; label?: string; active?: boolean }) {
-  return (
-    <TouchableOpacity className="items-center">
-      <Icon color={active ? '#FBBF24' : '#9CA3AF'} size={26} />
-      <Text className={`mt-1 text-xs ${active ? 'text-yellow-400' : 'text-gray-400'}`}>
-        {label}
+  const renderCategoryChip = ({ item }: { item: (typeof categories)[number] }) => (
+    <TouchableOpacity
+      onPress={() => setSelectedCategory(item)}
+      className={`mx-2 rounded-full px-4 py-2 ${
+        selectedCategory === item ? 'bg-[#A7C7E7]' : 'bg-gray-100'
+      }`}>
+      <Text className={`font-medium ${selectedCategory === item ? 'text-white' : 'text-gray-700'}`}>
+        {item}
       </Text>
     </TouchableOpacity>
   );
-}
 
-type NavItem = {
-  label: string;
-  Icon: any;
-};
+  const renderPromo = ({ item }: { item: Promo }) => (
+    <View className="mx-2 mb-6 overflow-hidden rounded-2xl shadow-sm">
+      <Image source={{ uri: item.image }} className="h-32 w-80" />
+      <View className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 p-3">
+        <Text className="text-base font-semibold text-white">{item.title}</Text>
+      </View>
+    </View>
+  );
 
-const navItems: NavItem[] = [
-  { label: 'Feed', Icon: User },
-  { label: 'Ads', Icon: Megaphone },
-  { label: 'Stories', Icon: Scroll },
-  { label: 'Search', Icon: Search },
-  // { label: 'Recommended', Icon: Users },
-];
+  const renderQuickPick = ({ item }: { item: Restaurant }) => (
+    <TouchableOpacity
+      onPress={() => router.push(`/restaurant/${item.id}` as `/restaurant/${string}`)}
+      className="mr-4 items-center">
+      <Image
+        source={{ uri: item.image }}
+        className="mb-2 h-32 w-32 items-center justify-center rounded-2xl bg-white shadow-md "
+      />
+      <Text className="text-center text-xs font-medium text-gray-800" numberOfLines={1}>
+        {item.name}
+      </Text>
+      <Text className="mt-1 text-xs text-gray-500">{item.eta}</Text>
+    </TouchableOpacity>
+  );
 
-function FloatingNavigationBar() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const translateX = useRef(new Animated.Value(0)).current;
-
-  const [sliderDimensions, setSliderDimensions] = useState<{
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  }>({
-    x: 0,
-    y: 0,
-    width: 0,
-    height: 0,
-  });
-
-  function find_dimesions(event: any) {
-    const { x, y, width, height } = event.nativeEvent.layout;
-    setSliderDimensions({
-      x,
-      y,
-      width: Math.floor(width),
-      height: Math.floor(height),
-    });
-  }
-
-  const handlePress = (index: number) => {
-    setActiveIndex(index);
-    Animated.spring(translateX, {
-      toValue: index * sliderDimensions.width,
-      useNativeDriver: true,
-      friction: 8,
-    }).start();
-  };
+  const renderNearby = ({ item }: { item: Restaurant }) => (
+    <TouchableOpacity
+      onPress={() => router.push(`/restaurant/${item.id}` as `/restaurant/${string}`)}
+      className="mr-4 items-center">
+      <View className="relative mb-2 aspect-video h-[10rem] items-center justify-center shadow-xl">
+        <Image source={{ uri: item.image }} className="h-full w-full rounded-lg" />
+        {item.deals && (
+          <View className="absolute right-2 top-2 flex-row items-center justify-center gap-2 rounded-lg bg-rose-500 px-2 py-1 blur-sm">
+            <Image
+              source={{ uri: 'https://img.icons8.com/dotty/80/FFFFFF/sale-price-tag.png' }}
+              style={{ width: 22, height: 22 }}
+              resizeMode="contain"
+            />
+            <Text className="text-sm text-white">{item.deals}</Text>
+          </View>
+        )}
+      </View>
+      <Text className="my-1 rounded-md bg-white p-2 text-gray-500 shadow-xl">About {item.eta}</Text>
+      <View className="items-left flex w-full justify-start gap-1 p-2">
+        <Text className="text-xl font-semibold text-gray-800" numberOfLines={1}>
+          {item.name}
+        </Text>
+        <Text className="mt-1 text-gray-500">$0.7 Delivery fee . 0.7mi</Text>
+        <Text className="text-gray-700 ">{item.rating}★(420)</Text>
+      </View>
+    </TouchableOpacity>
+  );
 
   return (
-    <View className="absolute bottom-8 left-0 right-0 flex flex-row items-center justify-start">
-      <View className="relative flex w-[70%] flex-row items-center justify-around overflow-hidden rounded-[2rem] bg-white px-2 py-4">
-        <View className="absolute inset-0 p-2">
-          <Animated.View
-            onLayout={find_dimesions}
-            style={{
-              transform: [{ translateX }],
-            }}
-            className="h-full w-1/4 rounded-3xl bg-rose-400 p-2 shadow-lg"
+    <View className="flex-1 bg-white">
+      <View className="px-6 pb-6 pt-14">
+        <View className="mb-2 flex-row items-center justify-between pt-[4rem]">
+          <View>
+            <Text className="text-2xl font-bold text-gray-900">Good morning, Foodie!</Text>
+            <Text className="text-sm text-gray-500">
+              {mode === 'pickup' ? 'Pickup from' : 'Deliver to'} • 123 Foodie St
+            </Text>
+          </View>
+          <TouchableOpacity className="p-2">
+            <Ionicons name="notifications-outline" size={24} color="#A7C7E7" />
+          </TouchableOpacity>
+        </View>
+
+        <View className="mt-6 flex-row items-center rounded-2xl bg-gray-50 px-4 py-3">
+          <Ionicons name="search" size={20} color="#9CA3AF" />
+          <TextInput
+            className="ml-3 flex-1 text-base text-gray-700"
+            placeholder="Search dishes or restaurants"
+            value={search}
+            onChangeText={setSearch}
+          />
+          {search ? (
+            <TouchableOpacity onPress={() => setSearch('')}>
+              <Ionicons name="close" size={20} color="#9CA3AF" />
+            </TouchableOpacity>
+          ) : null}
+        </View>
+      </View>
+
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={true}>
+        <View className="mb-6 px-6">
+          <FlatList
+            data={categories}
+            horizontal
+            renderItem={renderCategoryChip}
+            showsHorizontalScrollIndicator={false}
           />
         </View>
 
-        {navItems.map((item, index) => (
-          <TouchableOpacity
-            key={index}
-            className="flex-1 items-center rounded-2xl"
-            onPress={() => handlePress(index)}
-            activeOpacity={0.8}>
-            <item.Icon color={activeIndex === index ? 'white' : 'black'} size={27} />
-            <Text className={`text-md ${activeIndex === index ? 'text-white' : 'text-black'}`}>
-              {item.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-      <TouchableOpacity
-        className="absolute right-4 flex items-center rounded-full bg-white px-5 py-4"
-        activeOpacity={0.8}>
-        <Users color={'black'} size={27} />
-        <Text className={`text-md text-black`}>Explore</Text>
-      </TouchableOpacity>
+        <View className="mb-8 px-6">
+          <Image
+            source={{ uri: 'https://picsum.photos/600/300?random=90' }}
+            className="h-40 w-full rounded-3xl"
+          />
+          <View className="absolute left-10 top-10 w-40">
+            <Text className="text-xl font-bold text-white">A special dish</Text>
+            <Text className="mt-1 text-white/80">Prepared just for you</Text>
+          </View>
+        </View>
+
+        <View className="mb-6 px-6">
+          <Text className="mb-4 text-lg font-semibold text-gray-900">Quick Picks</Text>
+          <FlatList
+            data={mockQuickPicks}
+            horizontal
+            renderItem={renderQuickPick}
+            showsHorizontalScrollIndicator={false}
+          />
+        </View>
+
+        <View className="mb-6">
+          <Text className="mb-4 px-6 text-lg font-semibold text-gray-900">Special Offers</Text>
+          <FlatList
+            data={mockPromos}
+            horizontal
+            renderItem={renderPromo}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 6 }}
+          />
+        </View>
+
+        <View className="px-3 pb-[10rem]">
+          <Text className="mb-4 ml-2 text-lg font-semibold text-gray-900">Nearby Restaurants</Text>
+          <FlatList
+            className="p-2"
+            data={mockNearby}
+            horizontal
+            renderItem={renderNearby}
+            keyExtractor={(item) => item.id}
+            showsHorizontalScrollIndicator={false}
+          />
+        </View>
+      </ScrollView>
+      <BottomNavBAr></BottomNavBAr>
     </View>
   );
 }
