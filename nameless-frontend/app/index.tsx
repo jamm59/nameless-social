@@ -96,7 +96,12 @@ export default function Home() {
 
   const renderQuickPick = ({ item }: { item: Restaurant }) => (
     <TouchableOpacity
-      onPress={() => router.push(`/restaurant/${item.id}` as `/restaurant/${string}`)}
+      onPress={() =>
+        router.push({
+          pathname: '/restaurant/[id]',
+          params: { id: item.id },
+        })
+      }
       className="mr-4 items-center">
       <Image
         source={{ uri: item.image }}
@@ -111,7 +116,12 @@ export default function Home() {
 
   const renderNearby = ({ item }: { item: Restaurant }) => (
     <TouchableOpacity
-      onPress={() => router.push(`/restaurant/${item.id}` as `/restaurant/${string}`)}
+      onPress={() =>
+        router.push({
+          pathname: '/restaurant/[id]',
+          params: { id: item.id },
+        })
+      }
       className="mr-4 items-center">
       <View className="relative mb-2 aspect-video h-[10rem] items-center justify-center shadow-xl">
         <Image source={{ uri: item.image }} className="h-full w-full rounded-lg" />
