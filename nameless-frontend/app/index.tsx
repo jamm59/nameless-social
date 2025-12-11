@@ -1,9 +1,11 @@
 import { View, Text, TextInput, FlatList, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import type { Restaurant, Promo } from '~/types';
 import { Ionicons } from '@expo/vector-icons';
 import BottomNavBAr from '~/components/BottomNavBar';
+import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 
 const categories = ['Recommended', 'Pizza', 'Burger', 'Asian', 'Dessert', 'Drinks'] as const;
 
@@ -148,11 +150,12 @@ export default function Home() {
   );
 
   return (
-    <View className="flex-1 bg-white">
+    // <PatternBackground>
+    <View className='bg-transparent" absolute inset-0 flex-1'>
       <View className="px-6 pb-6 pt-14">
         <View className="mb-2 flex-row items-center justify-between pt-[4rem]">
           <View>
-            <Text className="text-2xl font-bold text-gray-900">Good morning, Foodie!</Text>
+            <Text className="text-2xl font-bold text-gray-900">Good morning, Ryan!</Text>
             <Text className="text-sm text-gray-500">
               {mode === 'pickup' ? 'Pickup from' : 'Deliver to'} • 123 Foodie St
             </Text>
@@ -162,7 +165,7 @@ export default function Home() {
           </TouchableOpacity>
         </View>
 
-        <View className="mt-6 flex-row items-center rounded-2xl bg-gray-50 px-4 py-3">
+        <View className="mt-6 flex-row items-center rounded-2xl bg-gray-50 px-4 py-3 shadow-xl">
           <Ionicons name="search" size={20} color="#9CA3AF" />
           <TextInput
             className="ml-3 flex-1 text-base text-gray-700"
@@ -232,7 +235,115 @@ export default function Home() {
           />
         </View>
       </ScrollView>
-      <BottomNavBAr></BottomNavBAr>
+    </View>
+    // </PatternBackground>
+  );
+}
+
+function PatternBackground({ children }: any) {
+  // Randomly pick pattern A or B once on mount
+  // const patternType = useMemo(() => (Math.random() < 0.5 ? 'A' : 'B'), []);
+
+  const patternType: string = 'A';
+
+  const gridLines = Array.from({ length: 50 });
+
+  return (
+    <View className="relative flex-1 overflow-hidden bg-[#f8fafc]">
+      {patternType === 'A' && (
+        <>
+          {/* Pattern A: Top white → transparent fade */}
+          <LinearGradient
+            colors={['#ffffff', 'rgba(255,255,255,0)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0, y: 1 }}
+            className="absolute inset-0"
+            style={{ height: '40%' }}
+          />
+
+          {/* Vertical grid lines */}
+          <View className="absolute inset-0 flex-row">
+            {gridLines.slice(0, 20).map((_, i) => (
+              <View
+                key={i}
+                className="h-full"
+                style={{
+                  width: 50,
+                  borderRightColor: '#ccc',
+                  borderRightWidth: 1,
+                  opacity: 1,
+                }}
+              />
+            ))}
+          </View>
+
+          {/* Fade mask (imitates CSS mask-image) */}
+          <LinearGradient
+            colors={['rgba(255,255,255,1)', 'rgba(255,255,255,0)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0, y: 1 }}
+            className="absolute inset-0"
+            style={{ opacity: 1 }}
+          />
+        </>
+      )}
+
+      {patternType === 'B' && (
+        <>
+          {/* Pattern B: Full grid (horizontal + vertical lines) */}
+          <View className="absolute inset-0">
+            {/* Vertical lines */}
+            <View className="absolute inset-0 flex-row">
+              {gridLines.map((_, i) => (
+                <View
+                  key={'v' + i}
+                  className="h-full"
+                  style={{
+                    width: 20,
+                    borderRightColor: '#e2e8f0',
+                    borderRightWidth: 1,
+                  }}
+                />
+              ))}
+            </View>
+
+            {/* Horizontal lines */}
+            <View className="absolute inset-0">
+              {gridLines.map((_, i) => (
+                <View
+                  key={'h' + i}
+                  style={{
+                    height: 30,
+                    borderBottomColor: '#e2e8f0',
+                    borderBottomWidth: 1,
+                  }}
+                />
+              ))}
+            </View>
+          </View>
+
+          {/* Radial fade mask (imitates mask-image: radial-gradient) */}
+          <LinearGradient
+            colors={['rgba(0,0,0,0.9)', 'rgba(0,0,0,0)']}
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 1 }}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '60%',
+              opacity: 0.35,
+            }}
+          />
+        </>
+      )}
+
+      {/* Content blur layer */}
+
+      <BlurView intensity={10} className="absolute inset-0 flex-1 bg-transparent">
+        {children}
+      </BlurView>
     </View>
   );
 }

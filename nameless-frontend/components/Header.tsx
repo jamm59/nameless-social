@@ -1,11 +1,11 @@
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 
-export default function Header({ title, rightAction }) {
+export default function Header({ title, rightAction }: any) {
   const router = useRouter();
 
   return (
-    <View className="flex-row items-center justify-between px-4 py-4 bg-white border-b border-gray-100">
+    <View className="flex-row items-center justify-between border-b border-gray-100 bg-white px-4 py-4">
       <TouchableOpacity onPress={() => router.back()}>
         <Text className="text-2xl text-gray-400">←</Text>
       </TouchableOpacity>

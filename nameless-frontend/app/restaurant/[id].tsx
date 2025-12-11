@@ -36,7 +36,17 @@ export default function RestaurantDetail() {
   );
 
   return (
-    <View className="flex-1">
+    <View className="relative flex-1">
+      <View className="absolute bottom-0 flex h-[8rem] w-full items-center justify-center bg-white px-8">
+        <TouchableOpacity
+          className="w-full rounded-[1.65rem] bg-blue-500 py-4 shadow-lg"
+          onPress={() => router.push('/cart')}>
+          <Text className="text-center text-xl font-bold text-white">Open Shopping Cart</Text>
+          {/* <View className="flex items-center justify-center h-full font-bold bg-red-400 rounded aspect-square">
+            <Text className="text-sm">{cartItems.length}</Text>
+          </View> */}
+        </TouchableOpacity>
+      </View>
       <View className="h-[30%] bg-rose-500">
         <View className="absolute bottom-4 left-4 right-4">
           <Text className="mb-1 text-2xl font-black text-white">Pizza Palace</Text>
@@ -58,7 +68,7 @@ export default function RestaurantDetail() {
 
       {/* Menu Area */}
       <View className="-mt-4 h-[70%] py-2">
-        <View className="px-4 pt-6">
+        <View className="flex items-center justify-center px-4 pt-6">
           {/* Search Bar */}
           <View className="mb-4 flex-row items-center rounded-2xl bg-gray-50 px-4 py-4">
             <Ionicons name="search" size={20} color="#9CA3AF" />
@@ -74,23 +84,24 @@ export default function RestaurantDetail() {
                 <Ionicons name="close" size={20} color="#9CA3AF" />
               </TouchableOpacity>
             )}
-
-            {/* <TouchableOpacity
-              className="items-center px-5"
-              onPress={() => router.push('/checkout')}>
-              <Ionicons name="cart" size={32} color="#A7C7E7" />
-              <Text className="font-bold text-gray-500">{cartItems.length}</Text>
-            </TouchableOpacity> */}
           </View>
 
           {/* Menu List */}
-          <FlatList
-            data={mockMenu}
-            renderItem={renderMenuItem}
-            keyExtractor={(item) => item.id}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 120 }}
-          />
+          {mockMenu.length === 0 ? (
+            <View className="w-1/2 items-center justify-center ">
+              <Text className="text-center text-lg text-gray-600">
+                No menu items available for this shop
+              </Text>
+            </View>
+          ) : (
+            <FlatList
+              data={mockMenu}
+              renderItem={renderMenuItem}
+              keyExtractor={(item) => item.id}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 120 }}
+            />
+          )}
         </View>
       </View>
     </View>
@@ -109,7 +120,7 @@ export function MenuItem({ item, addToCart }: MenuItemProps) {
   const handleDec = () => setQty((q) => (q > 1 ? q - 1 : q));
 
   return (
-    <View className="relative mb-5 items-center rounded-lg bg-white px-2 py-2">
+    <View className="relative mb-5 items-center rounded-lg border border-gray-200 bg-white px-2 py-2">
       <View className="items-left flex w-full justify-start gap-1 p-1">
         <View className="w-full flex-row items-center justify-between py-1">
           <Text className="text-xl font-semibold text-gray-800" numberOfLines={1}>
